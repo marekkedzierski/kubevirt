@@ -213,6 +213,11 @@ func (v *vm) Migrate(name string) error {
 	return v.restClient.Put().RequestURI(uri).Do(context.Background()).Error()
 }
 
+func (v *vm) MigrateCancel(name string) error {
+	uri := fmt.Sprintf(vmSubresourceURL, v1.ApiStorageVersion, v.namespace, name, "cancel_migrate")
+	return v.restClient.Put().RequestURI(uri).Do(context.Background()).Error()
+}
+
 func (v *vm) AddVolume(name string, addVolumeOptions *v1.AddVolumeOptions) error {
 	uri := fmt.Sprintf(vmSubresourceURL, v1.ApiStorageVersion, v.namespace, name, "addvolume")
 

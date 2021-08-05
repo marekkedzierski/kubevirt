@@ -256,6 +256,37 @@ func (app *SubresourceAPIApp) MigrateVMRequestHandler(request *restful.Request, 
 	response.WriteHeader(http.StatusAccepted)
 }
 
+func (app *SubresourceAPIApp) MigrateCancelVMRequestHandler(request *restful.Request, response *restful.Response) {
+	// Actual placeholder for migration cancelation call.	
+	name := request.PathParameter("name")
+	namespace := request.PathParameter("namespace")
+
+	vm, err := app.fetchVirtualMachine(name, namespace)
+	if err != nil {
+		writeError(err, response)
+		return
+	}
+
+	if !vm.Status.Ready {
+		writeError(errors.NewConflict(v1.Resource("virtualmachine"), name, fmt.Errorf("VM is not running")), response)
+		return
+	}
+
+	// Add correct state processing here
+	/*
+	for _, c := range vm.Status.Conditions {
+		if c.Type == v1.VirtualMachinePaused && c.Status == v12.ConditionTrue {
+			writeError(errors.NewConflict(v1.Resource("virtualmachine"), name, fmt.Errorf("VM is paused")), response)
+			return
+		}
+	}
+	*/
+	
+	// Here should be call to cancelation
+
+	response.WriteHeader(http.StatusAccepted)
+}
+
 func (app *SubresourceAPIApp) RestartVMRequestHandler(request *restful.Request, response *restful.Response) {
 	// RunStrategyHalted         -> doesn't make sense
 	// RunStrategyManual         -> send restart request

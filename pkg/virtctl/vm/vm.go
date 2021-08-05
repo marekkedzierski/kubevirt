@@ -38,15 +38,16 @@ import (
 )
 
 const (
-	COMMAND_START        = "start"
-	COMMAND_STOP         = "stop"
-	COMMAND_RESTART      = "restart"
-	COMMAND_MIGRATE      = "migrate"
-	COMMAND_GUESTOSINFO  = "guestosinfo"
-	COMMAND_USERLIST     = "userlist"
-	COMMAND_FSLIST       = "fslist"
-	COMMAND_ADDVOLUME    = "addvolume"
-	COMMAND_REMOVEVOLUME = "removevolume"
+	COMMAND_START          = "start"
+	COMMAND_STOP           = "stop"
+	COMMAND_RESTART        = "restart"
+	COMMAND_MIGRATE        = "migrate"
+	COMMAND_MIGRATE_CANCEL = "migrate_cancel"
+	COMMAND_GUESTOSINFO    = "guestosinfo"
+	COMMAND_USERLIST       = "userlist"
+	COMMAND_FSLIST         = "fslist"
+	COMMAND_ADDVOLUME      = "addvolume"
+	COMMAND_REMOVEVOLUME   = "removevolume"
 
 	volumeNameArg         = "volume-name"
 	notDefinedGracePeriod = -1
@@ -120,6 +121,21 @@ func NewMigrateCommand(clientConfig clientcmd.ClientConfig) *cobra.Command {
 		Args:    templates.ExactArgs("migrate", 1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c := Command{command: COMMAND_MIGRATE, clientConfig: clientConfig}
+			return c.Run(args)
+		},
+	}
+	cmd.SetUsageTemplate(templates.UsageTemplate())
+	return cmd
+}
+
+func NewCanelMigrateCommand(clientConfig clientcmd.ClientConfig) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "cancel_migrate (VM)",
+		Short:   "Cancel migration of virtual machine.",
+		Example: usage(COMMAND_MIGRATE_CANCEL),
+		Args:    templates.ExactArgs("cancel_migrate", 1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			c := Command{command: COMMAND_MIGRATE_CANCEL, clientConfig: clientConfig}
 			return c.Run(args)
 		},
 	}
@@ -388,6 +404,11 @@ func (o *Command) Run(args []string) error {
 		err = virtClient.VirtualMachine(namespace).Migrate(vmiName)
 		if err != nil {
 			return fmt.Errorf("Error migrating VirtualMachine %v", err)
+		}
+	case COMMAND_MIGRATE_CANCEL:
+		err = virtClient.VirtualMachine(namespace).MigrateCancel(vmiName)
+		if err != nil {
+			return fmt.Errorf("Error canceling migration of VirtualMachine %v", err)
 		}
 	case COMMAND_GUESTOSINFO:
 		guestosinfo, err := virtClient.VirtualMachineInstance(namespace).GuestOsInfo(vmiName)

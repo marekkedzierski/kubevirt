@@ -221,6 +221,7 @@ type VirtualMachineInterface interface {
 	Stop(name string) error
 	ForceStop(name string, graceperiod int) error
 	Migrate(name string) error
+	MigrateCancel(name string) error
 	AddVolume(name string, addVolumeOptions *v1.AddVolumeOptions) error
 	RemoveVolume(name string, removeVolumeOptions *v1.RemoveVolumeOptions) error
 	PortForward(name string, port int, protocol string) (StreamInterface, error)
